@@ -1,0 +1,2 @@
+# For dlms_test_vectors.py
+cryptography>=42.0
