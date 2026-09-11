@@ -776,8 +776,8 @@ the fictional values as test vectors.
    8B 07 60 85 74 05 08 02 05
    └─ [11] mechanism-name = 2.16.756.5.8.2.5
       = COSEM_High_Level_Security_Mechanism_Name_Using_GMAC
-      ★ mechanism_id(5). See ERRATUM E-1 — the supplied guide
-        calls GMAC "mechanism 4". It is 5.       [GB Table 75]
+      ★ mechanism_id(5). GMAC is commonly mis-quoted as
+        "mechanism 4". It is 5.                  [GB Table 75]
 
    AC 0A 80 08 4B 35 36 69 56 61 67 59
    │  │  │  │  └────────────────────┴─ CtoS = "K56iVagY"  [GB Table 43]
@@ -874,7 +874,7 @@ LN object, OBIS `0.0.40.0.0.255`), with the GMAC result as parameter. Because
 the security policy requires protection, the ACTION request is itself
 ciphered.
 
-**Computing the parameter** — this is [GB] Table 43, verified in Volume 0 §0.5:
+**Computing the parameter** — this is [GB] Table 43, verified in Volume 0 §0.4:
 
 ```
    IV  = 4D4D4D0000000001 ‖ 00000001      client Sys-T ‖ client IC
@@ -989,7 +989,7 @@ stored `CtoS`. Match → mutual authentication complete.
 
 ## 23.6 Packet 5 — Ciphered GET request
 
-**This is [GB] Table 40 exactly** — official, verified in Volume 0 §0.5.
+**This is [GB] Table 40 exactly** — official, verified in Volume 0 §0.4.
 
 ```
 C8 1E 30 01234567 411312FF935A47566827C467BC 7D825C3BE4A77C3FCC056B6B
@@ -1324,3 +1324,9 @@ suites, secure key storage from flash to secure element, the key provisioning
 lifecycle, key rotation, and random number generation on a microcontroller.**
 
 *End of Volume 4.*
+
+---
+
+← **Previous:** [Volume 3 — Keys, PKI and Key Agreement](VOL-3-Keys-PKI-and-Key-Agreement.md)  ·  **Next:** [Volume 5 — Embedded Firmware Implementation](VOL-5-Embedded-Firmware-Implementation.md) →
+
+[Back to the index](00-INDEX.md)

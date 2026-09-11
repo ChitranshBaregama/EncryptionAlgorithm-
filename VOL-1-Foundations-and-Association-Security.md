@@ -3,9 +3,9 @@
 **Volume 1 — Foundations and Application Association Security**
 *Chapters 1–6*
 
-> Read `00-MASTER-INDEX-AND-ERRATA.md` first. It defines the claim labels
+> Read [`00-INDEX.md`](00-INDEX.md) first. It defines the claim labels
 > ([SPEC] / [THEORY] / [IMPL] / [VENDOR] / [INFER]) used throughout, and lists
-> nine errors in the supplied Security Guide that this manual corrects.
+> the official test vectors this manual is verified against.
 
 ---
 
@@ -149,7 +149,9 @@ disconnect relay.**
 **A note you will need in review:** [GB] 9.2.3.3.5 says plainly *"For the
 purposes of DLMS/COSEM, the GMAC algorithm as specified in 9.2.3.3.7.2 shall
 be used."* If you see HMAC in a DLMS design document, someone has imported a
-TLS habit. See errata E-4 — the supplied guide makes exactly this mistake.
+TLS habit. The same confusion turns up around mechanism 6, where the
+specification asks for a plain SHA-256 hash and implementers reach for HMAC
+out of reflex.
 
 The MAC generation/verification model, from [GB] Figure 69:
 
@@ -923,8 +925,8 @@ encoded in base-128, then `05 08 01 03`.
 
 ### 4.4.2 The mechanism name
 
-**[SPEC]** [GB] Table 75 — and see **errata E-1**, the supplied guide has these
-shifted by one:
+**[SPEC]** [GB] Table 75. Take the numbering from the table itself — it is
+very commonly quoted shifted by one:
 
 ```
 COSEM_Authentication_Mechanism_Name ::=
@@ -1404,9 +1406,8 @@ structurally. Neither party's response can be replayed as the other's.
 
 ## 6.4 All six HLS mechanisms — the comparison table
 
-**[SPEC]** Built from [GB] Table 42 and Table 75. **See errata E-1 and E-4 —
-the supplied guide numbers these incorrectly and gets mechanism 6's formula
-wrong.**
+**[SPEC]** Built from [GB] Table 42 and Table 75. **Two things are commonly
+got wrong here: the mechanism numbering, and mechanism 6's formula.**
 
 | Mechanism | Primitive | Key / Secret | Pass 3 input `f(StoC)` | Output | Mutual? | Security | DLMS usage |
 |-----------|-----------|--------------|------------------------|--------|---------|----------|------------|
@@ -1619,3 +1620,9 @@ suites, ciphered APDU wire format, and every official Green Book test vector
 verified byte for byte.**
 
 *End of Volume 1.*
+
+---
+
+← **Previous:** [Volume 0 — Index and Source Policy](00-INDEX.md)  ·  **Next:** [Volume 2 — The Symmetric Core and the Wire Format](VOL-2-Symmetric-Core-and-Wire-Format.md) →
+
+[Back to the index](00-INDEX.md)

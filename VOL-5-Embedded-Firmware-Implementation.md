@@ -1169,3 +1169,9 @@ labs, four tiers of interview questions with answers, the SME capstone project
 with a grading rubric, and the full glossary.**
 
 *End of Volume 5.*
+
+---
+
+← **Previous:** [Volume 4 — General Ciphering and Packet Analysis](VOL-4-General-Ciphering-and-Packet-Analysis.md)  ·  **Next:** [Volume 6 — Failure Analysis, Attacks, Labs and Capstone](VOL-6-Debugging-Attacks-Labs-and-SME-Capstone.md) →
+
+[Back to the index](00-INDEX.md)

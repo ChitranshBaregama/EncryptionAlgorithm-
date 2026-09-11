@@ -24,7 +24,7 @@ capture; **firmware evidence** is what you would find with a debugger or a log.
 | **Likely cause** | Wrong mechanism, wrong password/secret, wrong application context, unknown client SAP |
 | **Packet evidence** | Compare AARQ `mechanism-name` OID against the meter's configuration; check `application-context-name` |
 | **Firmware evidence** | Association lookup failed on `(client SAP, server SAP)`; secret comparison failed |
-| **Diagnostic steps** | 1. Decode the `mechanism-name` last arc — see errata E-1. 2. Confirm the context_id permits ciphering if you intend to use it. 3. Confirm the client SAP maps to a configured association |
+| **Diagnostic steps** | 1. Decode the `mechanism-name` last arc against [GB] Table 75. 2. Confirm the context_id permits ciphering if you intend to use it. 3. Confirm the client SAP maps to a configured association |
 | **Fix** | Align the mechanism ID and context name with the meter's configuration |
 
 ### F-02 HLS pass 3 rejected
@@ -43,7 +43,7 @@ capture; **firmware evidence** is what you would find with a debugger or a log.
 | | |
 |--|--|
 | **Symptom** | HLS mech 5 tag does not match |
-| **Likely cause** | Challenge placed in plaintext rather than AAD (**errata E-3**); wrong AK; wrong system title; wrong SC in the AAD |
+| **Likely cause** | Challenge placed in plaintext rather than AAD; wrong AK; wrong system title; wrong SC in the AAD |
 | **Packet evidence** | If `f(StoC)` is longer than 17 octets, a ciphertext field is present that should not be |
 | **Firmware evidence** | `gcm_encrypt` called with non-empty plaintext |
 | **Diagnostic steps** | Assert `plaintext_len == 0` on the GMAC path. Print the AAD and compare against `10 D0D1…DEDF ‖ StoC` |
@@ -112,7 +112,7 @@ capture; **firmware evidence** is what you would find with a debugger or a log.
 | **Likely cause** | Misconfiguration, or a downgrade attempt |
 | **Packet evidence** | SC bits 3..0 ≠ configured `security_suite` |
 | **Firmware evidence** | Suite check missing from the receive path |
-| **Diagnostic steps** | Decode SC per [GB] Table 37 — **not** per the supplied guide (errata E-2) |
+| **Diagnostic steps** | Decode SC per [GB] Table 37 — suite ID is the low nibble, compression is bit 7 |
 | **Fix** | Reject any APDU whose SC suite differs from the security context |
 
 ### F-10 Wrong Security Control byte
@@ -120,7 +120,7 @@ capture; **firmware evidence** is what you would find with a debugger or a log.
 | | |
 |--|--|
 | **Symptom** | Protection weaker than policy; or a malformed-APDU rejection |
-| **Likely cause** | Wrong bit layout (errata E-2); Key_Set set on a `ded`/`general` APDU; compression set on a service-specific APDU |
+| **Likely cause** | Wrong Security Control bit layout; Key_Set set on a `ded`/`general` APDU; compression set on a service-specific APDU |
 | **Packet evidence** | Decode all 8 bits and check against the constraints in Volume 2 §9.2.3 |
 | **Fix** | Apply the full SC validation checklist |
 
@@ -509,7 +509,7 @@ future traffic are affected, and how to recover.
 
 **AAD and GMAC**
 
-11. Placing the HLS challenge in the plaintext instead of the AAD (errata E-3).
+11. Placing the HLS challenge in the plaintext instead of the AAD.
 12. Omitting the authentication key from the AAD.
 13. Including the APDU in the AAD when it is already the plaintext.
 14. Omitting length octets from the `general-ciphering` AAD.
@@ -519,7 +519,7 @@ future traffic are affected, and how to recover.
 
 **Security Control byte**
 
-18. Using the wrong bit layout (errata E-2).
+18. Using the wrong Security Control bit layout.
 19. Not validating the suite against the negotiated context (downgrade).
 20. Testing protection equality instead of a superset.
 21. Setting Key_Set on a `ded-` or `general-` ciphering APDU.
@@ -547,8 +547,8 @@ future traffic are affected, and how to recover.
 36. Not aborting the association after a failed pass 3.
 37. `memcmp` for tag or password comparison.
 38. No timeout on a pending HLS association.
-39. Using HMAC-SHA-256 for mechanism 6 instead of a plain hash (errata E-4).
-40. Using the wrong mechanism ID (errata E-1).
+39. Using HMAC-SHA-256 for mechanism 6 instead of a plain hash.
+40. Using the wrong mechanism ID.
 
 **Public key**
 
@@ -603,7 +603,7 @@ reuse, not just "it is bad".
 ### LAB 4 — Reproduce the GMAC test vector
 
 **Objective:** prove your GMAC construction against [GB] Table 43.
-**Materials:** `dlms_test_vectors.py` from Volume 0.
+**Materials:** `dlms_test_vectors.py` in the repository root.
 **Procedure:** compute `T = GMAC(SC ‖ AK ‖ StoC)` with the client IV. Then
 deliberately break it four ways: put StoC in the plaintext; drop the AK; use the
 server's System Title; truncate the tag from the LSB end. Observe each failure.
@@ -841,7 +841,7 @@ suites ([GB] 9.2.3.3.7.6). 3. **False and confused.** ECDSA signs; it never
 encrypts. **[SPEC]** *"Asymmetric key algorithms are not used for encryption in
 DLMS/COSEM."* And a public key verifies, it does not decrypt. 4. **False.** The
 dedicated key is transported under the GUEK, so GUEK compromise recovers every
-dedicated key from recorded AARQs. 5. **False** — errata E-2. `0x50` is suite
+dedicated key from recorded AARQs. 5. **False.** `0x50` is suite
 **0**, authentication only, **broadcast** key.
 
 ---
@@ -902,7 +902,7 @@ following.
 
 | Dimension | What earns 8–10 | What caps you at 4 or below |
 |-----------|-----------------|------------------------------|
-| **Specification fidelity** | Correct clause citations; correct SC layout; correct mechanism IDs; correct tag and IV lengths | Any of the errata E-1 to E-6 reproduced |
+| **Specification fidelity** | Correct clause citations; correct SC layout; correct mechanism IDs; correct tag and IV lengths | Any of the six classic specification errors reproduced |
 | **Counter design** | Reservation blocks with computed size; ping-pong + CRC; fail-closed; explicit power-loss analysis; forward-only recovery | Counter reset to zero anywhere, for any reason |
 | **Key storage** | KEK in OTP/SE; global keys wrapped at rest; per-device derivation from an HSM seed + System Title; honest statement of the physical-attack residual | Keys in application flash; fleet-wide keys |
 | **Authentication** | HLS mech 5 minimum; `HLS_PASS2_SENT` gate; `StoC != CtoS`; abort-on-failure; timeout; constant-time compare | Any path that permits a service before pass 3 |
@@ -1018,7 +1018,7 @@ InitiateRequest, protected by the GUEK. · — · Believing it gives forward sec
 
 **DLMS** — Device Language Message Specification. · The application protocol. ·
 IEC 62056-5-3 / DLMS UA 1000-2, the Green Book. · The xDLMS services and APDUs. ·
-— · Swapping the Blue and Green Book IEC numbers (errata E-7).
+— · Swapping the Blue and Green Book IEC numbers.
 
 **ECDH** — Elliptic Curve Diffie-Hellman. · Agreeing a key over a public
 channel. · `Z = d_A · Q_B = d_B · Q_A`. · **[SPEC]** Three schemes: C(2e,0s),
@@ -1035,7 +1035,7 @@ from the ECDLP. · **[SPEC]** *"particularly suitable for embedded devices"* —
 
 **GUEK (GEK)** — Global Unicast Encryption Key. · The main message key. · The
 GCM block cipher key for unicast. · **[SPEC]** SC bit 6 = 0. · `000102…0E0F` ·
-Calling it "GEK" in specification documents (errata E-9).
+Calling it "GEK" in specification documents.
 
 **GBEK** — Global Broadcast Encryption Key. · The key shared across a
 population. · GCM block cipher key for broadcast. · **[SPEC]** SC bit 6 = 1. · —
@@ -1048,11 +1048,11 @@ NIST SP 800-38D. · The DLMS message protection mode. · — · See AES-GCM.
 **[SPEC]** *"If the GCM input is restricted to data that is not to be encrypted,
 the resulting specialization of GCM, called GMAC"*. · HLS mechanism 5; `SC =
 0x10`. · `T = GMAC(SC ‖ AK ‖ StoC)` · Putting the challenge in the plaintext
-(errata E-3).
+instead of the AAD.
 
 **HLS** — High Level Security. · Mutual challenge-response authentication. ·
 Four passes; ITU-T X.811 mutual authentication. · **[SPEC]** mechanism_id 2–7. ·
-mechanism 5 = GMAC · Mis-numbering the mechanisms (errata E-1).
+mechanism 5 = GMAC · Mis-numbering the mechanisms.
 
 **HDLC** — High-level Data Link Control. · The framing layer. · Below the DLMS
 security boundary. · Its FCS is a CRC, not security. · — · Believing the FCS
@@ -1092,7 +1092,7 @@ EEPROM, FRAM. · Holds keys and counters. · — · Same wear domain for both.
 
 **OID** — Object Identifier. · A globally unique dotted-number name. · ASN.1
 type, BER-encoded. · **[SPEC]** DLMS-UA prefix `2.16.756.5.8`. ·
-`2.16.756.5.8.2.5` = HLS-GMAC · Getting the last arc wrong (errata E-1).
+`2.16.756.5.8.2.5` = HLS-GMAC · Getting the last arc wrong.
 
 **PDU / APDU** — Protocol Data Unit / Application PDU. · A protocol message. ·
 The unit of exchange. · xDLMS APDUs carry the services and are what gets
@@ -1107,7 +1107,7 @@ The unprotected APDU. · `C0010000080000010000FF0200` · For GMAC, `P` is **empt
 
 **SC** — Security Control byte. · One octet describing the protection applied. ·
 **[SPEC]** bit 7 compression, bit 6 Key_Set, bit 5 E, bit 4 A, bits 3..0 suite. ·
-First octet of the security header. · `0x30` · Wrong bit layout (errata E-2).
+First octet of the security header. · `0x30` · Wrong bit layout.
 
 **Security Context** — Suite + policy + material. · The configuration governing
 protection. · **[SPEC]** [GB] 9.2.2.3. · Managed by "Security setup" objects. ·
@@ -1124,7 +1124,7 @@ AES-GCM-128 · Saying "Suite 0 = AES-128" without decomposing what that means.
 
 **SHA** — Secure Hash Algorithm. · One-way digest. · FIPS PUB 180-4. ·
 **[SPEC]** SHA-256 (suite 1), SHA-384 (suite 2). · — · Using HMAC where a plain
-hash is specified (errata E-4).
+hash is specified.
 
 **SN / LN** — Short Name / Logical Name referencing. · Two ways to address COSEM
 objects. · SN uses 16-bit names; LN uses OBIS codes. · Determines the
@@ -1184,3 +1184,9 @@ If you take three things from this manual:
 ---
 
 *End of Volume 6. End of the manual.*
+
+---
+
+← **Previous:** [Volume 5 — Embedded Firmware Implementation](VOL-5-Embedded-Firmware-Implementation.md)
+
+[Back to the index](00-INDEX.md)

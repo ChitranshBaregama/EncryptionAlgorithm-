@@ -3,7 +3,7 @@
 **Volume 2 — The Symmetric Core and the Wire Format**
 *Chapters 7–13*
 
-> Prerequisites: Volume 0 (errata — especially **E-2** and **E-3**, which
+> Prerequisites: Volume 0 (claim labels and verified test vectors, which
 > concern this volume directly) and Volume 1.
 
 This is the volume that matters most. Every claim about byte layout below is
@@ -455,7 +455,7 @@ Set `P = ∅`. Then:
 **[SPEC]** [GB] 9.2.3.3.5: *"For the purposes of DLMS/COSEM, the GMAC
 algorithm as specified in 9.2.3.3.7.2 shall be used."*
 
-**This is precisely where the supplied guide goes wrong** (errata E-3). It
+**This is precisely where implementations go wrong.** It
 places the challenge in `P`. The Green Book places it in `A`. Chapter 9 proves
 it against the official vector.
 
@@ -568,7 +568,8 @@ protected.
        └──────────────────────────── 1 = V.44 compression applied
 ```
 
-> ⚠️ **This differs from the supplied Security Guide.** See errata **E-2**.
+> ⚠️ **Read the bit layout from [GB] Table 37, not from memory.** The suite
+> ID is the low nibble; compression is bit 7.
 > The guide places the suite ID in bits 7–6 and compression in bit 2. It is
 > wrong, and it produces incorrect decodes for every value involving broadcast,
 > compression, or suites 1/2.
@@ -672,7 +673,7 @@ ciphertext internally. Putting it in `A` as well would be redundant work.
 
 | Field | Value |
 |-------|-------|
-| Suite | **0** (not 1 — see errata E-2) |
+| Suite | **0** (not 1 — read the low nibble, not the top two bits) |
 | Protection | Authentication only |
 | Key used | Global **Broadcast** Encryption Key (GBEK) |
 
@@ -877,7 +878,7 @@ the plaintext to the AAD as well would double the GHASH work for no benefit.
 **3. When authenticating only, the APDU *is* the AAD.**
 
 For `E=0, A=1` there is nothing to encrypt, so the APDU goes into `A`. This is
-GMAC. **This is exactly the point the supplied guide gets wrong (errata E-3).**
+GMAC. **This is the single most commonly mis-implemented point in DLMS HLS.**
 
 ---
 
@@ -1067,7 +1068,7 @@ Now everything flips to the server's identity:
 | Wrong EK | Tag mismatch on pass 3 | Key provisioning mismatch | EK is the block cipher key; a wrong EK gives a wrong H and a wrong mask. |
 | Used server Sys-T in client's IV | Tag mismatch | Classic bug: using the *peer's* identity instead of your own for outgoing | The IV always uses the **originator's** system title. |
 | IC not incremented | Peer rejects with counter error | Missing counter update | Replay protection triggers before the tag is even checked. |
-| Challenge put in `P` instead of `A` | Tag mismatch, and an unexpected ciphertext field appears | **Errata E-3** — following the supplied guide | Your f() will be 17 + 8 = 25 octets instead of 17. |
+| Challenge put in `P` instead of `A` | Tag mismatch, and an unexpected ciphertext field appears | The classic HLS-GMAC mistake | Your f() will be 17 + 8 = 25 octets instead of 17. |
 | Tag truncated to 16 octets | Length mismatch, peer rejects | Library default | DLMS tag is **12** octets in all suites. |
 | Tag truncated from the wrong end | Tag mismatch | Took LSB instead of MSB | Take the **first** 12 octets. |
 | SC byte in AAD differs from SC on the wire | Tag mismatch | Built AAD with a hardcoded SC | The SC in the AAD must be the *actual* SC transmitted. |
@@ -1075,7 +1076,7 @@ Now everything flips to the server's identity:
 **[INFER]** In my experience the first, third, and last rows account for the
 majority of real HLS-GMAC failures. All three are invisible in a capture — the
 bytes look perfectly well-formed — which is why the test-vector self-check in
-Volume 0 §0.5 is worth building into your firmware as a power-on test.
+Volume 0 §0.4 is worth building into your firmware as a power-on test.
 
 ---
 
@@ -2542,7 +2543,7 @@ bytes.**
 3. `len(C) == len(P)`. AES decryption is never invoked by GCM.
 4. **[SPEC]** The tag is 96 bits in all three suites, taken from the MSB end.
 5. **[SPEC]** SC byte: bit 7 compression, bit 6 Key_Set, bit 5 E, bit 4 A,
-   bits 3..0 suite. (The supplied guide is wrong — errata E-2.)
+   bits 3..0 suite. (Not the other way round — this is a common error.)
 6. **[SPEC]** The authentication key goes in the **AAD**, never in the key slot
    and never on the wire.
 7. **[SPEC]** Auth-only ⇒ AAD = `SC ‖ AK ‖ APDU`, `P` empty. Authenticated
@@ -2564,3 +2565,9 @@ three key agreement schemes, the NIST Concatenation KDF, and X.509 certificates
 in DLMS.**
 
 *End of Volume 2.*
+
+---
+
+← **Previous:** [Volume 1 — Foundations and Association Security](VOL-1-Foundations-and-Association-Security.md)  ·  **Next:** [Volume 3 — Keys, PKI and Key Agreement](VOL-3-Keys-PKI-and-Key-Agreement.md) →
+
+[Back to the index](00-INDEX.md)

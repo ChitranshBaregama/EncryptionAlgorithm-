@@ -3,7 +3,7 @@
 **Volume 3 — Key Architecture, Key Establishment, and Public Key Cryptography**
 *Chapters 14–19*
 
-> Prerequisites: Volume 0 (errata and claim labels), Volume 1, Volume 2.
+> Prerequisites: Volume 0 (claim labels), Volume 1, Volume 2.
 
 ---
 
@@ -150,7 +150,7 @@ The prompt asked for a full property table per key. Here they are.
 
 | Property | Value |
 |----------|-------|
-| **Name** | GUEK. **Field shorthand "GEK" — see errata E-9.** |
+| **Name** | GUEK. **Field shorthand "GEK" is common but is not the specification term.** |
 | **Purpose** | **[SPEC]** *"Block cipher key for unicast xDLMS APDUs and/or COSEM Data"* — [GB] Table 20 |
 | **Size** | 128 / 128 / 256 bits by suite |
 | **Lifetime** | **[SPEC]** Static, global — *"may be used over several AAs established repeatedly between the same partners"* |
@@ -1963,7 +1963,7 @@ Collected across [GB] clause 9.2, the methods referenced are:
 
 | Method | Referenced in | Purpose |
 |--------|---------------|---------|
-| `security_activate` | [GB] 9.2 (via [SG]) | Activate a security policy |
+| `security_activate` | [GB] 9.2 | Activate a security policy |
 | `key_transfer` | [GB] 9.2.5.4 | Install wrapped symmetric keys |
 | `key_agreement` | [GB] 9.2.5.5 | C(2e,0s) ephemeral unified model |
 | `generate_key_pair` | [GB] 9.2.6.6.4 | Create an ECC key pair on the server |
@@ -1979,10 +1979,9 @@ And the attributes referenced: `security_policy`, `security_suite`,
 > method **numbering**, the exact invocation and return parameter structures,
 > and the version 0 / version 1 differences of the "Security setup" IC are
 > specified in **Blue Book DLMS UA 1000-1 Ed. 12:2014 clause 4.4.7**, which was
-> not supplied. See also errata **E-8**: the supplied Security Guide's
-> attribute table for this IC could not be verified and appears to model keys
-> as directly-writable attributes, which conflicts with [GB]'s
-> `key_transfer`-based model.
+> outside this source set. Treat any attribute table for this IC that models
+> keys as directly-writable attributes with suspicion — that conflicts with
+> [GB]'s `key_transfer`-based model.
 
 ---
 
@@ -2025,3 +2024,9 @@ protection, packet-by-packet capture analysis, Wireshark technique, and vendor
 implementation differences.**
 
 *End of Volume 3.*
+
+---
+
+← **Previous:** [Volume 2 — The Symmetric Core and the Wire Format](VOL-2-Symmetric-Core-and-Wire-Format.md)  ·  **Next:** [Volume 4 — General Ciphering and Packet Analysis](VOL-4-General-Ciphering-and-Packet-Analysis.md) →
+
+[Back to the index](00-INDEX.md)
