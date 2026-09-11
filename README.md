@@ -15,6 +15,7 @@ independently, and the script that does so is in this repository.
 
 | If you want to… | Go to |
 | :--- | :--- |
+| Understand PKI, ECC, ECDSA and certificates in general, with no protocol attached | [Companion volume — General PKI and ECC](PKI-ECC-CERTIFICATES.md) |
 | Understand how the manual is built and what its labels mean | [Volume 0 — Index and source policy](00-INDEX.md) |
 | Learn the subject properly, in order | [Volume 1](VOL-1-Foundations-and-Association-Security.md) → [Volume 2](VOL-2-Symmetric-Core-and-Wire-Format.md) |
 | Debug a live association failure | [Volume 6 §31 — failure-mode matrix](VOL-6-Debugging-Attacks-Labs-and-SME-Capstone.md) |
@@ -29,6 +30,7 @@ independently, and the script that does so is in this repository.
 | Vol | Chapters | Covers |
 | :--- | :--- | :--- |
 | **[0 — Index and source policy](00-INDEX.md)** | — | The single normative source, the claim-labelling convention, the volume map, verified test vectors, the knowledge map |
+| **[C — General PKI, ECC, ECDSA, ECDH and certificates](PKI-ECC-CERTIFICATES.md)** | 1–36 | **Protocol-independent companion.** Elliptic curves from first principles, ECDSA, ECDH, KDFs, X.509, CSRs, the Root CA / Sub-CA hierarchy, certificate validation, renewal and rollover, attack thinking, and an embedded implementation checklist |
 | **[1 — Foundations and association security](VOL-1-Foundations-and-Association-Security.md)** | 1–6 | Cryptographic prerequisites, the DLMS security architecture, the three security concepts, application association, LLS and all six HLS mechanisms |
 | **[2 — The symmetric core and the wire format](VOL-2-Symmetric-Core-and-Wire-Format.md)** | 7–13 | AES, AES-GCM in depth, GMAC, the Security Control byte bit by bit, the IV and invocation counter, System Title, security suites, and the ciphered APDU on the wire |
 | **[3 — Keys, PKI and key agreement](VOL-3-Keys-PKI-and-Key-Agreement.md)** | 14–19 | The key hierarchy (GUEK/GBEK/GAK/KEK), AES Key Wrap, global versus dedicated ciphering, ECDSA, ECDH, the three key-agreement schemes, the NIST Concat KDF, X.509 and PKI |
@@ -62,6 +64,24 @@ rather than guessing:
 
 That marker appears most often around COSEM interface-class detail, which
 lives in the Blue Book (DLMS UA 1000-1) and is outside this source set.
+
+---
+
+## Worked ECC examples
+
+[`ecc_worked_examples.py`](ecc_worked_examples.py) computes everything the
+companion volume's mathematics sections claim — the toy curve and its full
+group, key generation, an ECDH exchange where both sides land on the same
+point, an ECDSA signature verified three ways, and the recovery of a private
+key from two signatures that reused a nonce.
+
+```bash
+python3 ecc_worked_examples.py      # no dependencies
+```
+
+The nonce-reuse section is the one worth running. It is four lines of modular
+arithmetic, it works identically on P-256, and it has cost real systems their
+signing keys.
 
 ---
 

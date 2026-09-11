@@ -96,12 +96,17 @@ applies to your project rather than trusting this manual.
 | Vol | File | Chapters | Covers |
 |-----|------|----------|--------|
 | **0** | `00-INDEX.md` | — | Source policy, claim labels, volume map, verified test vectors, knowledge map |
+| **C** | `PKI-ECC-CERTIFICATES.md` | 1–36 | **Companion, protocol-independent.** PKI, ECC, ECDSA, ECDH, KDFs, X.509, CSRs, the CA hierarchy and the certificate lifecycle, with worked numbers |
 | **1** | `VOL-1-Foundations-and-Association-Security.md` | 1–6 | Crypto prerequisites, security architecture, the three concepts, application association, LLS, HLS |
 | **2** | `VOL-2-Symmetric-Core-and-Wire-Format.md` | 7–13 | AES, AES-GCM, GMAC deep dive, Security Control byte, IV/Invocation Counter, System Title, security suites, ciphered APDU wire format, verified test vectors |
 | **3** | `VOL-3-Keys-PKI-and-Key-Agreement.md` | 14–19 | Key architecture, key wrap/KEK, global vs dedicated, ECDSA, ECDH, the three key agreement schemes, NIST Concat KDF, X.509 and PKI |
 | **4** | `VOL-4-General-Ciphering-and-Packet-Analysis.md` | 20–24 | General-ciphering, general-signing, multi-layer protection, third-party end-to-end, COSEM data protection, packet-by-packet captures, Wireshark, vendor differences |
 | **5** | `VOL-5-Embedded-Firmware-Implementation.md` | 25–30 | Firmware module architecture, memory budgets, secure key storage, RNG on MCU, provisioning lifecycle, key rotation |
 | **6** | `VOL-6-Debugging-Attacks-Labs-and-SME-Capstone.md` | 31–38 | Failure-mode matrix, attack analysis, key-compromise blast radius, top-50 mistakes, 12 labs, 45 interview questions with answers, SME capstone with rubric, glossary |
+
+The companion volume is general: it explains the cryptography and the
+certificate infrastructure without reference to any one protocol, and it can be
+read on its own. Read it before Volume 3 if public-key work is new to you.
 
 Volumes 1 and 2 are the load-bearing ones. If you internalise those, you can
 already sit in front of a capture of a ciphered `glo-get-request` and reason
