@@ -6,8 +6,9 @@ words, written for the engineer who has to **implement, review and debug** it
 on a microcontroller — not for the person writing a standards summary.
 
 Built from **DLMS UA 1000-2 Ed. 8.0 (Green Book, 8th edition)** as its sole
-normative source. Every official test vector in it has been reproduced
-independently, and the script that does so is in this repository.
+normative source. The included script checks selected Table 40 and Table 43 examples and
+exits nonzero on a mismatch. Passing these examples is not complete protocol
+conformance or validation of a production security implementation.
 
 ---
 
@@ -112,10 +113,11 @@ TABLE 43 - HLS mechanism 5 (GMAC)
   f(CtoS) T = FE1466AFB3DBCD4F9389E2B7  expected FE1466AFB3DBCD4F9389E2B7  -> MATCH
 ```
 
-**This is the practical takeaway of the whole manual.** These are the vectors
-your firmware self-test should use. If your AES-GCM layer reproduces Table 40
-and Table 43, then your IV construction, AAD construction, tag truncation and
-key handling are all correct. Volume 2 walks each one byte by byte.
+These selected vectors are useful regression inputs for IV construction,
+AAD construction and tag truncation. Matching them does not prove complete
+key handling, counter persistence, replay protection or protocol conformance.
+The script reports all six comparisons and exits nonzero on any mismatch.
+Volume 2 walks the examples byte by byte.
 
 ---
 

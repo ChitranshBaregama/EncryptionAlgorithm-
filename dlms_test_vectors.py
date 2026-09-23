@@ -1,6 +1,17 @@
 """Verify Green Book 8th Ed. official test vectors (Table 40, Table 43)."""
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+failures = 0
+checks = 0
+
+def check_hex(actual, expected):
+    """Record every mismatch and keep checking the remaining vectors."""
+    global failures, checks
+    checks += 1
+    if actual.upper() != expected.upper():
+        failures += 1
+        return "-> MISMATCH"
+    return "-> MATCH"
 
 H = bytes.fromhex
 
@@ -27,7 +38,7 @@ ct, T = gcm(EK, IV, A, b"")
 print("\n[SC=0x10 authentication only]")
 print("  AAD = SC||AK||APDU =", A.hex().upper())
 print("  computed T =", T.hex().upper(), " expected 06725D910F9221D263877516",
-      "-> MATCH" if T.hex().upper() == "06725D910F9221D263877516" else "-> MISMATCH")
+      check_hex(T.hex().upper(), "06725D910F9221D263877516"))
 full = H("C8") + bytes([0x1E]) + SC + H("01234567") + APDU + T
 print("  APDU =", full.hex().upper())
 
@@ -36,7 +47,7 @@ SC = H("20")
 ct, T = gcm(EK, IV, b"", APDU)
 print("\n[SC=0x20 encryption only]")
 print("  computed C =", ct.hex().upper(), " expected 411312FF935A47566827C467BC",
-      "-> MATCH" if ct.hex().upper() == "411312FF935A47566827C467BC" else "-> MISMATCH")
+      check_hex(ct.hex().upper(), "411312FF935A47566827C467BC"))
 full = H("C8") + bytes([0x12]) + SC + H("01234567") + ct
 print("  APDU =", full.hex().upper())
 
@@ -47,9 +58,9 @@ ct, T = gcm(EK, IV, A, APDU)
 print("\n[SC=0x30 authenticated encryption]")
 print("  AAD = SC||AK =", A.hex().upper())
 print("  computed C =", ct.hex().upper(),
-      "-> MATCH" if ct.hex().upper() == "411312FF935A47566827C467BC" else "-> MISMATCH")
+      check_hex(ct.hex().upper(), "411312FF935A47566827C467BC"))
 print("  computed T =", T.hex().upper(), " expected 7D825C3BE4A77C3FCC056B6B",
-      "-> MATCH" if T.hex().upper() == "7D825C3BE4A77C3FCC056B6B" else "-> MISMATCH")
+      check_hex(T.hex().upper(), "7D825C3BE4A77C3FCC056B6B"))
 full = H("C8") + bytes([0x1E]) + SC + H("01234567") + ct + T
 print("  APDU =", full.hex().upper())
 
@@ -70,7 +81,7 @@ print("\n[Pass 3: f(StoC) computed by CLIENT]")
 print("  IV  =", IV_C.hex().upper())
 print("  AAD = SC||AK||StoC =", A.hex().upper())
 print("  T   =", T.hex().upper(), " expected 1A52FE7DD3E72748973C1E28",
-      "-> MATCH" if T.hex().upper() == "1A52FE7DD3E72748973C1E28" else "-> MISMATCH")
+      check_hex(T.hex().upper(), "1A52FE7DD3E72748973C1E28"))
 print("  f(StoC) = SC||IC||T =", (SC + H("00000001") + T).hex().upper())
 
 # Pass 4: server processes CtoS. Server Sys-T + server IC.
@@ -81,5 +92,8 @@ print("\n[Pass 4: f(CtoS) computed by SERVER]")
 print("  IV  =", IV_S.hex().upper())
 print("  AAD = SC||AK||CtoS =", A.hex().upper())
 print("  T   =", T.hex().upper(), " expected FE1466AFB3DBCD4F9389E2B7",
-      "-> MATCH" if T.hex().upper() == "FE1466AFB3DBCD4F9389E2B7" else "-> MISMATCH")
+      check_hex(T.hex().upper(), "FE1466AFB3DBCD4F9389E2B7"))
 print("  f(CtoS) = SC||IC||T =", (SC + H("01234567") + T).hex().upper())
+
+print(f"\n{checks} checks, {failures} failed")
+raise SystemExit(1 if failures else 0)
